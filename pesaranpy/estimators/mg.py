@@ -82,10 +82,18 @@ def estimate_mean_group(design: dict) -> MeanGroup:
         speed_adjust_list.append(phi_i)
         short_run_matrix.append(sr_i)
 
+    N = len(long_run_matrix)
+    if N == 0:
+        k_regs = 1 + 1 + k_long + (by_unit[units[0]]["SR"].shape[1] if units else 0)
+        raise RuntimeError(
+            f"MG estimator: all {len(units)} units were discarded. "
+            f"Every unit has T_eff <= k={k_regs} regressors. "
+            f"Reduce p or q, add more time periods, or use fewer long_run_vars."
+        )
+
     long_run_matrix = np.array(long_run_matrix)
     speed_adjust_arr = np.array(speed_adjust_list)
     short_run_matrix = np.array(short_run_matrix)
-    N = len(speed_adjust_arr)
 
     theta_mg = long_run_matrix.mean(axis=0)
     phi_mg = speed_adjust_arr.mean()

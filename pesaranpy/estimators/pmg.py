@@ -57,11 +57,23 @@ def estimate_pmg(
         }
 
     if initial_theta is None:
-        from pesaranpy.estimators.mg import estimate_mean_group
-        mg = estimate_mean_group(design)
-        theta = mg.long_run_coef.copy()
+        try:
+            from pesaranpy.estimators.mg import estimate_mean_group
+            mg = estimate_mean_group(design)
+            theta = mg.long_run_coef.copy()
+        except RuntimeError as exc:
+            warnings.warn(
+                f"MG initialization failed ({exc}). Using zero initialization for PMG.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            theta = np.zeros(k_long)
     else:
-        theta = np.array(initial_theta, dtype=float).copy()
+        theta = np.asarray(initial_theta, dtype=float).ravel()
+        if theta.shape != (k_long,):
+            raise ValueError(
+                f"initial_theta must have shape ({k_long},), got {theta.shape}"
+            )
 
     converged = False
     for it in range(max_iter):
