@@ -13,6 +13,8 @@ class MeanGroup:
     short_run_se: np.ndarray
     individual_coef: dict
     n_units: int
+    n_obs: int
+    dep_var: str
     long_run_names: list
     short_run_names: list
 
@@ -94,6 +96,8 @@ def estimate_mean_group(design: dict) -> MeanGroup:
     phi_se = np.sqrt(((speed_adjust_arr - phi_mg) ** 2).sum() / (N * (N - 1)))
     sr_se = np.sqrt(((short_run_matrix - sr_mg) ** 2).sum(axis=0) / (N * (N - 1)))
 
+    n_obs = sum(by_unit[u]["T_eff"] for u in individual_coef)
+
     return MeanGroup(
         long_run_coef=theta_mg,
         long_run_se=theta_se,
@@ -103,6 +107,8 @@ def estimate_mean_group(design: dict) -> MeanGroup:
         short_run_se=sr_se,
         individual_coef=individual_coef,
         n_units=N,
+        n_obs=n_obs,
+        dep_var=design["dep_var"],
         long_run_names=design["long_run_names"],
         short_run_names=design["short_run_names"]
     )

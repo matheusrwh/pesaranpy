@@ -18,6 +18,8 @@ class PooledMeanGroup:
     n_iterations: int
     converged: bool
     n_units: int
+    n_obs: int
+    dep_var: str
     long_run_names: list
     short_run_names: list
 
@@ -145,6 +147,8 @@ def estimate_pmg(
         H_e = p["H_dy"] - phi[u] * (p["H_ylag"] - p["H_X"] @ theta)
         ll += -0.5 * T_i * np.log(2 * np.pi * s2) - 0.5 * (e @ H_e) / s2
 
+    n_obs = sum(pre[u]["T_i"] for u in units)
+
     return PooledMeanGroup(
         long_run_coef=theta,
         long_run_se=theta_se,
@@ -159,6 +163,8 @@ def estimate_pmg(
         n_iterations=it + 1,
         converged=converged,
         n_units=N,
+        n_obs=n_obs,
+        dep_var=design["dep_var"],
         long_run_names=design["long_run_names"],
         short_run_names=design["short_run_names"],
     )

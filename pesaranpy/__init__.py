@@ -15,6 +15,7 @@ from pesaranpy.utils.data import PanelData, prepare_panel, build_ecm_design
 from pesaranpy.estimators.mg import MeanGroup, estimate_mean_group
 from pesaranpy.estimators.pmg import PooledMeanGroup, estimate_pmg
 from pesaranpy.diagnostics.hausman import HausmanResult, hausman_test
+from pesaranpy.summary import summary
 
 __version__ = "0.1.0"
 
@@ -31,4 +32,6 @@ __all__ = [
     # Diagnóstico
     "HausmanResult",
     "hausman_test",
+    # Apresentação
+    "summary",
 ]
