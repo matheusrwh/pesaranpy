@@ -25,6 +25,7 @@ class HausmanResult:
     p_value: float
     df: int
     diff_coefs: np.ndarray
+    long_run_names: list
     note: str
 
 
@@ -89,5 +90,6 @@ def hausman_test(
         p_value=p_value,
         df=rank,
         diff_coefs=diff,
+        long_run_names=list(efficient_results.long_run_names),
         note=note,
     )

@@ -11,15 +11,20 @@ _Z95 = 1.96  # 95% normal CI multiplier
 
 
 def summary(result) -> str:
-    """Return a formatted summary string for a MeanGroup or PooledMeanGroup result."""
+    """Return a formatted summary string for MeanGroup, PooledMeanGroup, or HausmanResult."""
     from pesaranpy.estimators.mg import MeanGroup
     from pesaranpy.estimators.pmg import PooledMeanGroup
+    from pesaranpy.diagnostics.hausman import HausmanResult
 
     if isinstance(result, MeanGroup):
         return _summary_mg(result)
     if isinstance(result, PooledMeanGroup):
         return _summary_pmg(result)
-    raise TypeError(f"Expected MeanGroup or PooledMeanGroup, got {type(result).__name__}")
+    if isinstance(result, HausmanResult):
+        return _summary_hausman(result)
+    raise TypeError(
+        f"Expected MeanGroup, PooledMeanGroup, or HausmanResult, got {type(result).__name__}"
+    )
 
 
 # ── layout primitives ─────────────────────────────────────────────────────────
@@ -152,3 +157,63 @@ def _summary_pmg(r) -> str:
         "cross-sectional variance (phi, short-run)",
     ]
     return _build("Pooled Mean Group Estimation Summary", meta, sections, notes)
+
+
+# ── Hausman ───────────────────────────────────────────────────────────────────
+
+def _summary_hausman(r) -> str:
+    alpha = 0.05
+    reject = r.p_value < alpha
+    conclusion = (
+        f"Reject H0 at {int(alpha*100)}% -- slope heterogeneity detected; prefer MG."
+        if reject else
+        f"Fail to reject H0 at {int(alpha*100)}% -- long-run homogeneity supported; PMG efficient."
+    )
+
+    # Metadata block
+    lines = [
+        _sep(_WO, "="),
+        "Hausman Specification Test".center(_WO),
+        _sep(_WO, "="),
+        _meta_row("Efficient estimator:", "PMG",  "Consistent estimator:", "MG"),
+        _meta_row(
+            "H0:", "Long-run slope homogeneity (PMG efficient)",
+        ),
+        _meta_row(
+            "H1:", "Slope heterogeneity (only MG consistent)",
+        ),
+        _sep(_WO, "="),
+        _meta_row(
+            "Chi-sq statistic:", f"{r.statistic:.4f}",
+            "Degrees of freedom:", str(r.df),
+        ),
+        _meta_row("P-value:", f"{r.p_value:.4f}"),
+        _sep(_WO, "="),
+    ]
+
+    # Coefficient differences table (no SE available — display only values)
+    _NC_H = max(16, max((len(n) for n in r.long_run_names), default=8) + 2)
+    _col_w = [14, 14]  # MG-PMG diff col only
+
+    hdr = f"{'Variable':<{_NC_H}}{'MG - PMG':>14}"
+    sep_inner = "-" * (_NC_H + 14)
+    diff_lines = [
+        "Coefficient Differences (MG - PMG)".center(_WI),
+        _sep(_WI, "="),
+        hdr,
+        sep_inner,
+    ]
+    for name, d in zip(r.long_run_names, r.diff_coefs):
+        diff_lines.append(f"{name:<{_NC_H}}{d:>14.6f}")
+    diff_lines.append(_sep(_WI, "="))
+
+    lines.append("")
+    lines.extend(diff_lines)
+    lines.append("")
+    lines.append(f"  Conclusion: {conclusion}")
+
+    if r.note:
+        lines.append("")
+        lines.append(f"  Note: {r.note}")
+
+    return "\n".join(lines)
