@@ -75,7 +75,7 @@ build_ecm_design(
 
 Constructs per-unit ARDL(p, q) design matrices in ECM form:
 
-$$\Delta y_{it} = \varphi_i(y_{i,t-1} - \theta_i' x_{it}) + \sum_{j=1}^{p-1}\lambda^*_{ij}\,\Delta y_{i,t-j} + \sum_{j=0}^{q-1}\delta^{*\prime}_{ij}\,\Delta x_{i,t-j} + \mu_i + \varepsilon_{it}$$
+$$\Delta y_{it} = \varphi_i(y_{i,t-1} - \theta_i' x_{it}) + \sum_{j=1}^{p-1}\lambda^*_{ij}\,\Delta y_{i,t-j} + \sum_{j=0}^{q-1}{\delta^*_{ij}}'\,\Delta x_{i,t-j} + \mu_i + \varepsilon_{it}$$
 
 Follows the `xtpmg` convention: the EC term uses $x_{it}$ (contemporaneous levels), not $x_{i,t-1}$. Variables in `short_run_vars` enter only as first differences and are not restricted to a long-run relationship.
 
