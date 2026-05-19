@@ -75,7 +75,7 @@ build_ecm_design(
 
 Constructs per-unit ARDL(p, q) design matrices in ECM form:
 
-$$\Delta y_{it} = \varphi_i(y_{i,t-1} - \theta_i' x_{it}) + \sum_{j=1}^{p-1}\lambda^*_{ij}\,\Delta y_{i,t-j} + \sum_{j=0}^{q-1}{\delta^*_{ij}}'\,\Delta x_{i,t-j} + \mu_i + \varepsilon_{it}$$
+$$\Delta y_{it} = \varphi_i(y_{i,t-1} - \theta_i^{\prime} x_{it}) + \sum_{j=1}^{p-1}\lambda^{\ast}_{ij}\,\Delta y_{i,t-j} + \sum_{j=0}^{q-1}{\delta^{\ast}_{ij}}^{\prime}\,\Delta x_{i,t-j} + \mu_i + \varepsilon_{it}$$
 
 Follows the `xtpmg` convention: the EC term uses $x_{it}$ (contemporaneous levels), not $x_{i,t-1}$. Variables in `short_run_vars` enter only as first differences and are not restricted to a long-run relationship.
 
@@ -121,7 +121,7 @@ estimate_pmg(
 
 PMG estimator (Pesaran, Shin & Smith, 1999). Maximizes the concentrated log-likelihood by alternating between closed-form updates of $(\varphi_i, \sigma^2_i)$ and a linear solve for the pooled $\theta$. Initializes from $\hat\theta_{MG}$ if `initial_theta` is not provided.
 
-Long-run SE and VCOV are derived from the inverse of the concentrated Hessian $A = \sum_i (\hat\varphi_i^2 / \hat\sigma_i^2)\, X_i' M_{W_i} X_i$.
+Long-run SE and VCOV are derived from the inverse of the concentrated Hessian $A = \sum_i (\hat\varphi_i^2 / \hat\sigma_i^2)\, X_i^{\prime} M_{W_i} X_i$.
 
 | Field | Description |
 |---|---|
@@ -148,7 +148,7 @@ hausman_test(
 
 Hausman specification test for long-run slope homogeneity:
 
-$$H = (\hat\theta_{MG} - \hat\theta_{PMG})'\,[\hat V_{MG} - \hat V_{PMG}]^{-1}\,(\hat\theta_{MG} - \hat\theta_{PMG}) \overset{d}{\to} \chi^2(k)$$
+$$H = (\hat\theta_{MG} - \hat\theta_{PMG})^{\prime}\,[\hat V_{MG} - \hat V_{PMG}]^{-1}\,(\hat\theta_{MG} - \hat\theta_{PMG}) \overset{d}{\to} \chi^2(k)$$
 
 $\hat V_{MG}$ is the full cross-sectional covariance matrix constructed from the unit-level $\hat\theta_i$. If $\hat V_{MG} - \hat V_{PMG}$ is not positive semi-definite (finite-sample occurrence), the Moore-Penrose pseudoinverse is used and degrees of freedom are adjusted to the effective rank.
 
